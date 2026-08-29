@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Galeri Sejarah Berharga dan Indah — E2EE</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<div id="loginPage">
+  <div class="stars"></div>
+  <div class="login-card">
+    <div class="brand-mark">ANDRI<span>°</span></div><div class="film">▣</div>
+    <h1>Galeri Sejarah</h1><h2>Berharga & Indah</h2><p class="tagline">by ANDRI • E2EE</p>
+    <form id="loginForm">
+      <div class="field"><span>👤</span><input id="email" type="text" placeholder="Username" autocomplete="off" required></div>
+      <div class="field"><span>🔑</span><input id="password" type="password" placeholder="Password / kunci enkripsi" required><button type="button" id="togglePassword">👁</button></div>
+      <button class="enter-btn" type="submit">MASUK <b>→</b></button><p id="errorMessage">Username atau password salah.</p>
+    </form>
+    <small>File, foto, musik, dan catatan dienkripsi di browser sebelum dikirim ke server.</small>
+  </div>
+</div>
+
+<div id="galleryPage">
+<aside>
+  <div class="side-logo">A<span>•</span></div><div class="side-title">GALERI<br><strong>ANDRI</strong></div><div class="side-line"></div>
+  <p>SEJARAH<br>BERHARGA<br>DAN INDAH</p>
+  <div class="security-badge">🔐 ENKRIPSI AKTIF</div>
+  <button id="logoutBtn">↪ Keluar</button>
+</aside>
+
+<section class="content">
+  <div class="topbar">
+    <div><p class="eyebrow">ARSIP KENANGAN • PRIVATE</p><h1>Galeri Sejarah Berharga dan Indah</h1><p class="desc">Foto, video, musik, file, dan catatan. Konten dienkripsi di perangkat sebelum disimpan online.</p></div>
+    <div class="clock" id="clock">--:--:--</div>
+  </div>
+
+  <div class="upload-panel">
+    <div class="upload-copy"><div class="upload-icon">＋</div><div><h3>Simpan ke Arsip</h3><p>Pilih foto, video, musik, atau file. Maksimum 50 MB per file pada contoh ini.</p></div></div>
+    <div class="upload-buttons">
+      <label for="photoInput">📷 Foto</label><input id="photoInput" type="file" accept="image/*" multiple>
+      <label for="videoInput">🎬 Video</label><input id="videoInput" type="file" accept="video/*" multiple>
+      <label for="musicInput">🎵 Musik</label><input id="musicInput" type="file" accept="audio/*" multiple>
+      <label for="fileInput">📁 File</label><input id="fileInput" type="file" multiple>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" id="galleryTab">📦 Arsip</button>
+    <button class="tab" id="notesTab">📝 Catatan</button>
+  </div>
+
+  <div id="gallerySection">
+    <div class="section-head"><div><span>KOLEKSI TERENKRIPSI</span><h2>Kenangan & File</h2></div><div id="countLabel">0 item</div></div>
+    <div id="gallery" class="gallery"></div>
+  </div>
+
+  <div id="notesSection" class="notes-section" style="display:none">
+    <div class="notes-head"><div><span>CATATAN TERENKRIPSI</span><h2>Tulis Ceritamu</h2></div><button id="newNoteBtn">＋ Catatan Baru</button></div>
+    <div id="noteEditor" class="note-editor" style="display:none">
+      <label class="note-image-label">🖼️ Upload gambar untuk catatan <input id="noteImageInput" type="file" accept="image/*"></label>
+      <div id="noteImagePreview" class="note-image-preview"></div>
+      <input id="noteTitle" maxlength="100" placeholder="Judul catatan (opsional)">
+      <textarea id="noteText" placeholder="Tulis catatanmu di sini..."></textarea>
+      <div class="note-editor-actions"><button id="saveNoteBtn">💾 Simpan Catatan</button><button id="cancelNoteBtn">Batal</button></div>
+    </div>
+    <div id="notesList" class="notes-list"></div>
+  </div>
+</section>
+</div>
+
+<div id="loading"><div class="ring"></div><p id="loadingText">Membuka arsip...</p></div>
+<script src="script.js"></script>
+
+
+
+</body>
+</html>

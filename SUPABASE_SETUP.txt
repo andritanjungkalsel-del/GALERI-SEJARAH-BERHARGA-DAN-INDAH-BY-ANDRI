@@ -1,0 +1,100 @@
+PENGATURAN GALERI ONLINE + E2EE
+==================================
+
+Versi ini menambahkan:
+- Simpan foto
+- Simpan video
+- Simpan musik/audio + pemutar
+- Simpan file umum + tombol Simpan/Download
+- Catatan online
+- Catatan dapat memiliki gambar di atas, lalu teks catatan di bawahnya
+- Enkripsi AES-GCM 256-bit di browser sebelum upload
+- Kunci enkripsi diturunkan dari password login dengan PBKDF2-SHA-256
+- Data yang tersimpan di Storage adalah ciphertext
+
+PENTING TENTANG E2EE:
+Konten file dan isi catatan dienkripsi di browser. Namun contoh login masih berupa username/password yang tertanam di JavaScript, sehingga ini BUKAN sistem keamanan akun profesional. Jangan gunakan password yang sama untuk akun penting. Untuk keamanan produksi, gunakan Supabase Auth dan jangan menaruh password admin di frontend.
+
+1. Buat project Supabase.
+2. Storage -> New bucket -> nama: galeri -> Private.
+3. SQL Editor -> jalankan SQL:
+
+create extension if not exists pgcrypto;
+
+create table if not exists public.gallery_media (
+  id uuid primary key default gen_random_uuid(),
+  title_encrypted text not null,
+  path text not null unique,
+  type text not null check (type in ('image','video','audio','file')),
+  original_name_encrypted text,
+  mime_type text,
+  uploaded_at timestamptz not null default now()
+);
+
+create table if not exists public.gallery_notes (
+  id uuid primary key default gen_random_uuid(),
+  title_encrypted text not null,
+  text_encrypted text not null,
+  image_path text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.gallery_media enable row level security;
+alter table public.gallery_notes enable row level security;
+
+grant select, insert on public.gallery_media to anon, authenticated;
+grant select, insert, update, delete on public.gallery_notes to anon, authenticated;
+
+drop policy if exists "Gallery media can be viewed" on public.gallery_media;
+create policy "Gallery media can be viewed" on public.gallery_media
+for select to anon, authenticated using (true);
+
+drop policy if exists "Gallery media can be uploaded" on public.gallery_media;
+create policy "Gallery media can be uploaded" on public.gallery_media
+for insert to anon, authenticated with check (true);
+
+drop policy if exists "Gallery notes can be viewed" on public.gallery_notes;
+create policy "Gallery notes can be viewed" on public.gallery_notes
+for select to anon, authenticated using (true);
+
+drop policy if exists "Gallery notes can be inserted" on public.gallery_notes;
+create policy "Gallery notes can be inserted" on public.gallery_notes
+for insert to anon, authenticated with check (true);
+
+drop policy if exists "Gallery notes can be updated" on public.gallery_notes;
+create policy "Gallery notes can be updated" on public.gallery_notes
+for update to anon, authenticated using (true) with check (true);
+
+drop policy if exists "Gallery notes can be deleted" on public.gallery_notes;
+create policy "Gallery notes can be deleted" on public.gallery_notes
+for delete to anon, authenticated using (true);
+
+-- Storage policies: file terenkripsi sebelum masuk.
+drop policy if exists "Gallery encrypted files can be viewed" on storage.objects;
+create policy "Gallery encrypted files can be viewed" on storage.objects
+for select to anon, authenticated using (bucket_id='galeri');
+
+drop policy if exists "Gallery encrypted files can be uploaded" on storage.objects;
+create policy "Gallery encrypted files can be uploaded" on storage.objects
+for insert to anon, authenticated with check (bucket_id='galeri');
+
+drop policy if exists "Gallery encrypted files can be deleted" on storage.objects;
+create policy "Gallery encrypted files can be deleted" on storage.objects
+for delete to anon, authenticated using (bucket_id='galeri');
+
+4. Jika Data API baru digunakan, expose gallery_media dan gallery_notes ke Data API.
+
+5. Ambil Project URL dan Publishable Key dari Supabase Settings -> API Keys.
+   Edit script.js:
+   const SUPABASE_URL="...";
+   const SUPABASE_PUBLISHABLE_KEY="...";
+
+6. Upload index.html, style.css, script.js ke GitHub/hosting.
+
+Catatan:
+- Maksimum file pada contoh ini 50 MB.
+- File video/audio dienkripsi penuh sebelum upload, jadi saat dibuka browser akan mendekripsi di perangkat.
+- Metadata seperti waktu upload masih dapat terlihat oleh server.
+- Karena policy contoh memakai anon, siapa pun yang mengetahui project endpoint dapat mengambil ciphertext. Tanpa kunci enkripsi, isinya tetap tidak dapat dibaca melalui aplikasi ini.
+- Jangan membagikan password/kunci enkripsi. Jika lupa password, ciphertext tidak dapat dipulihkan oleh aplikasi.
